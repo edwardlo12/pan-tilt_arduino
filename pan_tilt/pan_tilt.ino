@@ -13,6 +13,8 @@ int tilt_pin = 3;     //TILT控制腳位
 int x_max = 640;      //原始圖資寬
 int y_max = 480;      //原始圖資高
 double x_z, y_z, x_org, y_org, x_edge, y_edge;
+int trashold_x;      
+int trashold_y;      
 char buf[32];
 
 void setup() {
@@ -32,6 +34,9 @@ void setup() {
   x_edge = x_z / tan(89 * deg2rad); //x軸最大邊緣值
   y_edge = y_z / tan(89 * deg2rad); //y軸最大邊緣值
 
+  int trashold_x = 10;      //x軸制動值
+  int trashold_y = 10;      //y軸制動值
+
   x_org = 0;  //初始化X原始位置
   y_org = 0;  //初始化Y原始位置
 
@@ -41,8 +46,7 @@ void loop() {
 
   int x, y, posite;
 
-  int trashold_x = 10;
-  int trashold_y = 10;
+  
 
   x = Serial.read();
   y = Serial.read();
