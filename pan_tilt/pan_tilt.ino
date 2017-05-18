@@ -21,7 +21,7 @@ int led = 13;
 
 void setup() {
 
-  Serial.begin(19200);
+  Serial.begin(9600);
   Serial.print("Starting...\n");
 
   pan.attach(pan_pin);
@@ -53,13 +53,20 @@ void loop() {
     int inChar = Serial.read();//not using this
 
     if (inChar != 'n') {
-      incomingByte += (char)inChar;
+      Serial.print("incomingByte:" + incomingByte + "f\n");
+      if (inChar != 10)
+        incomingByte += (char)inChar;
+      Serial.print("incomingByte:" + incomingByte + " inChar:" + inChar + "b\n");
     }
     else {
       int x, y;
 
       x = int(incomingByte[0] - '0') * 100 + int(incomingByte[1] - '0') * 10 + int(incomingByte[2] - '0') * 1;
       y = int( incomingByte[4] - '0') * 100 + int(incomingByte[5] - '0') * 10 + int(incomingByte[6] - '0') * 1;
+
+      sprintf(buf, "x=%d  y=%d\n", x, y);     //確認x、y值是否正確(無法使用)
+      Serial.print(buf);
+
       x = CV_X(x);
       y = CV_Y(y);
       if (abs(x_org + x) < x_edge || abs(y_org + y) < y_edge)
@@ -84,6 +91,7 @@ void loop() {
       }
       incomingByte = "";
     }
+
     digitalWrite(led, HIGH);
     delay(500);
   }
@@ -91,8 +99,7 @@ void loop() {
   delay(500);
   //x=320,y=240;
 
-  //sprintf(buf, "x=%f  y=%f\n", x, y);     //確認x、y值是否正確(無法使用)
-  //Serial.print(buf);
+
 
 }
 
