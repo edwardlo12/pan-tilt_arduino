@@ -35,7 +35,7 @@ void setup() {
 
   Serial.println(String("") + "x_z=" + x_z + " y_z=" + y_z);
 
-  x_edge = x_z * tan(89 * deg2rad); //x軸最大邊緣值
+  x_edge = 180; //x軸最大邊緣值
   y_edge = y_z * tan(89 * deg2rad); //y軸最大邊緣值
 
   Serial.println(String("") + "x_edge=" + x_edge + " y_edge=" + y_edge);
@@ -43,8 +43,8 @@ void setup() {
   int trashold_x = 10;      //x軸制動值
   int trashold_y = 10;      //y軸制動值
 
-  x_org = 0;  //初始化X原始位置
-  y_org = 0;  //初始化Y原始位置
+  x_org = 90;  //初始化X原始位置
+  y_org = 90;  //初始化Y原始位置
 
   pinMode(led, OUTPUT);
   digitalWrite(led, LOW);
@@ -69,46 +69,50 @@ void loop() {
 
       Serial.println(String("") + "IN: x_org=" + x_org + " y_org=" + y_org);
 
-      x = int(incomingByte[1] - '0') * 100 + int(incomingByte[2] - '0') * 10 + int(incomingByte[3] - '0') * 1;
+      x = int(incomingByte[0] - '0') * 100 + int(incomingByte[1] - '0') * 10 + int(incomingByte[2] - '0') * 1;
 
-      if (incomingByte[0] == '-')
-        x = x * -1;
+      //if (incomingByte[0] == '-')
+      //x = x * -1;
 
-      y = int( incomingByte[6] - '0') * 100 + int(incomingByte[7] - '0') * 10 + int(incomingByte[8] - '0') * 1;
+      y = int( incomingByte[4] - '0') * 100 + int(incomingByte[5] - '0') * 10 + int(incomingByte[6] - '0') * 1;
 
-      if (incomingByte[5] == '-')
-        y = y * -1;
+      //if (incomingByte[5] == '-')
+      //y = y * -1;
 
       sprintf(buf, "x=%d  y=%d\n", x, y);     //確認x、y值是否正確(無法使用)
       Serial.print(buf);
 
-      //x = CV_X(x);
-      //y = CV_Y(y);
-      if (abs(x_org + x) < x_edge && abs(x) > trashold_x) { //pan控制區
-        pan.write(90 + atan((x_org + x) / x_z)*rad2deg);
-        x_org = x_org + x;
-        Serial.println(String("") + "x_deg=" + atan((x_org + x) / x_z)*rad2deg );
+      x = CV_X(x);
+      y = CV_Y(y);
+
+      sprintf(buf, "x=%d  y=%d\n", x, y);     //確認x、y值是否正確(無法使用)
+      Serial.print(buf);
+
+      if (x_org + atan(x / x_z)*rad2deg < 180 && x_org + atan(x / x_z)*rad2deg > 0 && abs(x) > trashold_x) { //pan控制區
+        pan.write(x_org + atan(x / x_z)*rad2deg);
+        x_org = x_org + atan(x / x_z) * rad2deg;
+        Serial.println(String("") + "x_deg=" + atan(x / x_z)*rad2deg );
       }
-      else {
+      else if (abs(x) > trashold_x) {
         if (x > 0)
-          pan.write(180), x_org = x_edge;
+          pan.write(180), x_org = 180;
         else
-          pan.write(0), x_org = x_edge * -1;
+          pan.write(0), x_org = 0;
 
         Serial.print("EDGE\n");
 
       }
 
-      if (abs(y_org + y) < y_edge && abs(y) > trashold_y) { //tilt控制區
-        tilt.write(90 + atan((y_org + y) / y_z)*rad2deg);
+      if (y_org + atan(y / y_z)*rad2deg < 180 && y_org + atan(y / y_z)*rad2deg > 0 && abs(y) > trashold_y) { //tilt控制區
+        tilt.write(y_org + atan(y / y_z)*rad2deg);
         y_org = y_org + y;
-        Serial.println(String("") + "y_deg=" + atan((y_org + y) / y_z)*rad2deg );
+        Serial.println(String("") + "y_deg=" + atan(y / y_z)*rad2deg);
       }
-      else {
+      else if (abs(y) > trashold_y) {
         if (y > 0)
-          tilt.write(180), y_org = y_edge;
+          tilt.write(180), y_org = 180;
         else
-          tilt.write(0), y_org = y_edge * -1;
+          tilt.write(0), y_org = 0;
 
         Serial.print("EDGE\n");
       }
