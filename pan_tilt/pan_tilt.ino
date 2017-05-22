@@ -35,10 +35,10 @@ void setup() {
 
   Serial.println(String("") + "x_z=" + x_z + " y_z=" + y_z);
 
-  x_edge = 180; //x軸最大邊緣值
-  y_edge = y_z * tan(89 * deg2rad); //y軸最大邊緣值
+  //x_edge = 180; //x軸最大邊緣值
+  //y_edge = y_z * tan(89 * deg2rad); //y軸最大邊緣值
 
-  Serial.println(String("") + "x_edge=" + x_edge + " y_edge=" + y_edge);
+  //Serial.println(String("") + "x_edge=" + x_edge + " y_edge=" + y_edge);
 
   int trashold_x = 10;      //x軸制動值
   int trashold_y = 10;      //y軸制動值
@@ -146,10 +146,10 @@ void loop() {
     }
 
     digitalWrite(led, HIGH);
-    delay(500);
+    //delay(500);
   }
   digitalWrite(led, LOW);
-  delay(500);
+  //delay(500);
   //x=320,y=240;
 
 
