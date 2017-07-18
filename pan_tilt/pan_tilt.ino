@@ -16,8 +16,9 @@ float x_z, y_z, x_org, y_org, x_edge, y_edge;
 int trashold_x;
 int trashold_y;
 char buf[32];
-String incomingByte = ""; // for incoming serial data
+String incomingByte; // for incoming serial data
 int led = 13;
+int period;
 
 void setup() {
 
@@ -56,30 +57,18 @@ void setup() {
 void loop() {
   while (Serial.available() > 0) {
     delay(1);
-    int inChar = Serial.read();//not using this
- 
-    if (inChar != 'n') {
-     
-      //Serial.print("incomingByte:" + incomingByte + "f\n");
-      if (inChar != 10)
-        incomingByte += (char)inChar;
-      //Serial.print("incomingByte:" + incomingByte + " inChar:" + inChar + "b\n");
-    }
-    else {
-      int x, y;
+    
+    incomingByte=Serial.readString();
+      String x_char, y_char;
+      int x,y;
 
       Serial.println(String("") + "IN: x_org=" + x_org + " y_org=" + y_org);
-
-      x = int(incomingByte[0] - '0') * 100 + int(incomingByte[1] - '0') * 10 + int(incomingByte[2] - '0') * 1;
-
-      //if (incomingByte[0] == '-')
-      //x = x * -1;
-
-      y = int( incomingByte[4] - '0') * 100 + int(incomingByte[5] - '0') * 10 + int(incomingByte[6] - '0') * 1;
-
-      //if (incomingByte[5] == '-')
-      //y = y * -1;
-
+      period=incomingByte.indexOf(',');
+      x_char=incomingByte.substring(0,period);
+      x=x_char.toInt();
+      y_char = incomingByte.substring(period+1);
+      y=y_char.toInt();
+      
       sprintf(buf, "x=%d  y=%d\n", x, y);     //確認x、y值是否正確(無法使用)
       Serial.print(buf);
 
@@ -149,7 +138,7 @@ void loop() {
           tilt.write(0), y_org = y_edge * -1;
         }*/
       incomingByte = "";
-    }
+    
 
     digitalWrite(led, HIGH);
     delay(1);
